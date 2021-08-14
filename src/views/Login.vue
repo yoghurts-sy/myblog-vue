@@ -1,0 +1,131 @@
+<template>
+    <div >
+        <el-container>
+            <el-header>
+                <img src="../assets/login-head.png" class="login-head">
+            </el-header>
+            <el-main class="m-container">
+                <div class="login-header">
+                    <div class="login-head-div">Sign in to Yoghurt.</div>
+                </div>
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                    <el-form-item label="Username" prop="username">
+                        <el-input v-model="ruleForm.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="Password" prop="password">
+                        <el-input type="password" v-model="ruleForm.password"></el-input>
+                    </el-form-item>
+                    <el-form-item class="el-form-item-button">
+                        <el-button type="primary" @click="submitForm('ruleForm')">Sign in</el-button>
+                        <el-button @click="resetForm('ruleForm')">Reset</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-main>
+        </el-container>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                ruleForm: {
+                    username: '',
+                    password: '',
+                },
+                rules: {
+                    username: [
+                        { required: true, message: 'Please enter Username', trigger: 'blur' },
+                        { min: 3, max: 15, message: 'Length should be 3 to 15 bytes', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: 'Please enter Username', trigger: 'blur' },
+                        { min: 6, max: 15, message: 'Length should be 3 to 15 bytes', trigger: 'blur' }
+                    ]
+                }
+            };
+        },
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        let _this = this;
+
+
+
+                        this.$axios.post('/login', this.ruleForm).then(res => {
+
+                            const jwt = res.headers['authorization']
+                            const userInfo = res.data.data;
+                            console.log(userInfo);
+                            console.log(jwt);
+
+                            console.log("----------------")
+                            _this.$store.commit("SET_TOKEN", jwt)
+                            _this.$store.commit("SET_USERINFO", userInfo)
+                            console.log(_this.$store.state.userInfo)
+                            console.log(_this.$store.state.token)
+                            _this.$router.push("/blogs")
+
+
+
+                        })
+
+
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    .m-container {
+        text-align: center;
+        max-width: 960px;
+    }
+
+    .el-header {
+        background-color: white;
+        color: white;
+        text-align: center;
+        line-height: 60px;
+        height: 200px;
+    }
+    .el-main {
+        background-color: white;
+        color: #333;
+        text-align: center;
+        width: 500px;
+        margin: 0 auto;
+        /*line-height: 160px;*/
+    }
+
+    demo-ruleForm > el-form-item-button {
+        margin-left: -10px;
+    }
+
+
+    .login-head {
+        height: 100%;
+    }
+
+    .login-header {
+        color: black;
+        height: 50px;
+        margin-bottom: 10px;
+    }
+    .login-head-div {
+        height: 100%;
+        font-size: large;
+        font-weight: bold;
+        font-style:oblique;
+        padding-top: 10px;
+    }
+</style>
