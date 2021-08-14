@@ -4,6 +4,7 @@ import BlogDetail from '../views/BlogDetail.vue'
 import BlogEdit from '../views/BlogEdit.vue'
 import Blogs from '../views/Blogs.vue'
 import Login from '../views/Login.vue'
+import Register from "../views/Register";
 
 Vue.use(Router)
 
@@ -49,5 +50,10 @@ export default new Router({
         requireAuth:true
       }
     },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register
+    }
   ]
 })

@@ -9,8 +9,8 @@
                     <div class="login-head-div">Sign in to Yoghurt.</div>
                 </div>
                 <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-                    <el-form-item label="Username" prop="username">
-                        <el-input v-model="ruleForm.username"></el-input>
+                    <el-form-item label="Email" prop="email">
+                        <el-input v-model="ruleForm.email"></el-input>
                     </el-form-item>
                     <el-form-item label="Password" prop="password">
                         <el-input type="password" v-model="ruleForm.password"></el-input>
@@ -18,6 +18,7 @@
                     <el-form-item class="el-form-item-button">
                         <el-button type="primary" @click="submitForm('ruleForm')">Sign in</el-button>
                         <el-button @click="resetForm('ruleForm')">Reset</el-button>
+                        <el-button @click="signUp">Sign up</el-button>
                     </el-form-item>
                 </el-form>
             </el-main>
@@ -30,17 +31,15 @@
         data() {
             return {
                 ruleForm: {
-                    username: '',
+                    email: '',
                     password: '',
                 },
                 rules: {
-                    username: [
-                        { required: true, message: 'Please enter Username', trigger: 'blur' },
-                        { min: 3, max: 15, message: 'Length should be 3 to 15 bytes', trigger: 'blur' }
+                    email: [
+                        { required: true, message: 'Please enter Email', trigger: 'blur' },
                     ],
                     password: [
-                        { required: true, message: 'Please enter Username', trigger: 'blur' },
-                        { min: 6, max: 15, message: 'Length should be 3 to 15 bytes', trigger: 'blur' }
+                        { required: true, message: 'Please enter Password', trigger: 'blur' },
                     ]
                 }
             };
@@ -50,8 +49,6 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         let _this = this;
-
-
 
                         this.$axios.post('/login', this.ruleForm).then(res => {
 
@@ -67,8 +64,6 @@
                             console.log(_this.$store.state.token)
                             _this.$router.push("/blogs")
 
-
-
                         })
 
 
@@ -80,6 +75,9 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+            },
+            signUp() {
+                this.$router.push("/register")
             }
         }
     }
