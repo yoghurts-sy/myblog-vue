@@ -40,10 +40,7 @@
             console.log(blogId)
 
             this.$axios.get('/blog/' + blogId).then(res => {
-
-
                 console.log(res.data)
-
 
                 let blog = res.data.data
                 _this.blog.userId = blog.userId

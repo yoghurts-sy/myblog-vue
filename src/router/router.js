@@ -30,6 +30,11 @@ export default new Router({
       component: () => import('../views/Blogs.vue')
     },
     {
+      path: '/blogs/:username',
+      name: 'Blogs',
+      component:Blogs
+    },
+    {
       path: '/blog/add',
       name: 'BlogAdd',
       component: BlogEdit,
