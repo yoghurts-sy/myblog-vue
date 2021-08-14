@@ -33,18 +33,36 @@
                 blogs:{},
                 currentPage: 1,
                 total: 0,
-                pageSize: 5
+                pageSize: 5,
             }
         },
         methods:{
             Page(currentPage) {
+                let username = this.$route.params.username
+                console.log(username)
+
+                let URL = ''
+                if (username === undefined) {
+                    URL = 'blogs?currentPage='+currentPage
+                } else {
+                    URL = 'blogs/'+ username + '?currentPage='+currentPage
+
+                }
                 const _this = this
-                this.$axios.get('blogs?currentPage='+currentPage).then(res => {
+                this.$axios.get(URL,{
+                    headers:{
+                        "Authorization":_this.$store.state.token
+                    }
+                }).then(res => {
                     console.log(res.data)
                     _this.blogs = res.data.data.records
                     _this.currentPage = res.data.data.current
                     _this.total = res.data.data.total
                     _this.pageSize = res.data.data.size
+
+                    if (_this.total === 0) {
+                        _this.$message('该用户无blog');
+                    }
                 })
             }
         },

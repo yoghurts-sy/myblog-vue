@@ -44,15 +44,11 @@
                     }
                 }
 
-                ).then(
-                    res => {
+                ).then(res => {
                     _this.$store.commit("REMOVE_INFO")
                     _this.$router.push("/login")
                 }
                 )
-
-
-
             }
         },
         created() {
@@ -61,6 +57,7 @@
                 console.log("localStorage token:"+localStorage.getItem("token"))
             }
             if (sessionStorage.getItem("userInfo") !== '') {
+                console.log(sessionStorage.getItem("userInfo"));
                 this.$store.commit("SET_USERINFO", JSON.parse(sessionStorage.getItem("userInfo")))
                 console.log("sessionStorage userInfo:"+JSON.parse(sessionStorage.getItem("userInfo")).username)
             }

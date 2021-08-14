@@ -1,29 +1,5 @@
-# default
-
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## To do List
+1. 完成通过username就能访问博客的设置
+    * 欠缺直接访问时，给用户展示对方的信息
+2. 完成邮箱验证登录
+3. 改造可以上传markdown文件
