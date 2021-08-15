@@ -37,11 +37,8 @@
             const _this = this
             const blogId = this.$route.params.blogId
             this.blog.blogId = blogId
-            console.log(blogId)
 
             this.$axios.get('/blog/' + blogId).then(res => {
-                console.log(res.data)
-
                 let blog = res.data.data
                 _this.blog.userId = blog.userId
                 _this.blog.title = blog.title

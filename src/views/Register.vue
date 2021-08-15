@@ -102,17 +102,11 @@
 
                             const jwt = res.headers['authorization']
                             const userInfo = res.data.data;
-                            console.log(userInfo);
-                            console.log(jwt);
 
-                            console.log("----------------")
                             _this.$store.commit("SET_TOKEN", jwt)
                             _this.$store.commit("SET_USERINFO", userInfo)
-                            console.log(_this.$store.state.userInfo)
-                            console.log(_this.$store.state.token)
                             _this.$router.push("/blogs")
 
-                            console.log(res)
                         })
                     } else {
                         console.log('error submit!!');
@@ -124,7 +118,6 @@
                 console.log("submit!")
             },
             handleRemove(file, fileList) {
-                console.log(file, fileList);
                 this.ruleForm.avatar = ''
                 this.isUploadAvatar = false
             },
@@ -132,7 +125,6 @@
                 console.log(file);
             },
             handleAvatarSuccess(res) {
-                console.log(res)
                 this.ruleForm.avatar = res.data
                 this.isUploadAvatar = true
             }

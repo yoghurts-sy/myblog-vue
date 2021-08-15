@@ -54,14 +54,9 @@
 
                             const jwt = res.headers['authorization']
                             const userInfo = res.data.data;
-                            console.log(userInfo);
-                            console.log(jwt);
 
-                            console.log("----------------")
                             _this.$store.commit("SET_TOKEN", jwt)
                             _this.$store.commit("SET_USERINFO", userInfo)
-                            console.log(_this.$store.state.userInfo)
-                            console.log(_this.$store.state.token)
                             _this.$router.push("/blogs")
 
                         })

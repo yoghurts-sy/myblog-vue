@@ -54,7 +54,6 @@
                         "Authorization":_this.$store.state.token
                     }
                 }).then(res => {
-                    console.log(res.data)
                     _this.blogs = res.data.data.records
                     _this.currentPage = res.data.data.current
                     _this.total = res.data.data.total
