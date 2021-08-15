@@ -2,18 +2,34 @@
     <div>
         <Header></Header>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="Title" prop="title">
+            <el-form-item label="标题" prop="title">
                 <el-input v-model="ruleForm.title"></el-input>
             </el-form-item>
-            <el-form-item label="Description" prop="description">
+            <el-form-item label="描述" prop="description">
                 <el-input v-model="ruleForm.description"></el-input>
             </el-form-item>
-            <el-form-item label="Content" prop="content">
-                <mavon-editor v-model="ruleForm.content"></mavon-editor>
+            <el-form-item label="内容" prop="content">
+                <el-upload
+                        class="upload-demo"
+                        action="http://localhost:8090/api/md/convert2String"
+                        :on-preview="handlePreview"
+                        :on-remove="handleRemove"
+                        :on-success="uploadMdSuccess"
+                        :auto-upload="true">
+                        <el-link icon="el-icon-document"
+                             :disabled="validateUser"
+                                 slot="trigger"
+                    >上传本地Markdown</el-link>
+                    <!--<el-button slot="trigger" size="small" type="primary">选取文件</el-button>--><!--@click="uploadMd"-->
+                </el-upload>
+
+                <mavon-editor ref=md v-model="ruleForm.content" @imgAdd="imgAdd" @imgDel="imgDel"
+                    @change="changeContent"
+                ></mavon-editor>
             </el-form-item>
             <el-form-item >
-                <el-button type="primary" @click="submitForm('ruleForm')" :disabled="validateUser">commit</el-button>
-                <el-button @click="resetForm('ruleForm')" :disabled="validateUser">reset</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm')" :disabled="validateUser">保存</el-button>
+                <el-button @click="resetForm('ruleForm')" :disabled="validateUser">重置</el-button>
                 <span v-show="validateUser" style="margin-left: 35px; color: red">It's not your blogs. You don't have right to edit it.</span>
             </el-form-item>
         </el-form>
@@ -27,6 +43,7 @@
         components: {Header},
         data(){
             return {
+                preContent:'',
                 userId:null,
                 validateUser:false,
                 ruleForm: {
@@ -60,10 +77,8 @@
                             headers:{
                                 "Authorization":_this.$store.state.token
                             }
-
-
                         }).then(res => {
-                            this.$alert('commited', 'Callback', {
+                            this.$alert('保存成功！', '提示', {
                                 confirmButtonText: 'OK',
                                 callback: action => {
                                     _this.$router.push("/blogs")
@@ -79,12 +94,45 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+            },
+            imgAdd(pos, $file){
+                // 第一步.将图片上传到服务器.
+                var formdata = new FormData()
+                formdata.append('file', $file)
+                let _this = this
+                this.$axios({
+                    url: 'api/md/upload',
+                    method: 'post',
+                    data: formdata,
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }).then((res) => {
+                    // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
+                    console.log("res:"+res.data)
+                    let url = res.data.data
+                    _this.$refs.md.$imglst2Url([[pos, url]])
+                })
+            },
+            imgDel(pos) {
+
+            },
+            changeContent(value, render) {
+                //自动保存
+            },
+            uploadMdSuccess(res) {
+                console.log("res:"+res.data)
+                this.preContent = this.ruleForm.content
+                this.ruleForm.content = res.data
+            },
+            handlePreview() {
+
+            },
+            handleRemove() {
+                this.ruleForm.content = this.preContent
             }
         },
         created() {
             const _this = this
             const blogId = this.$route.params.blogId
-            console.log("blogId:"+blogId)
             if (blogId) {
                 this.$axios.get('/blog/'+blogId).then(res => {
                     const blog = res.data.data
