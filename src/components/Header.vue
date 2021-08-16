@@ -35,9 +35,6 @@
         methods:{
             signOut() {
                 const _this = this
-
-                this.$axios.post('',)
-
                 this.$axios.get('/logout', {
                     headers:{
                         "Authorization":_this.$store.state.token
@@ -56,9 +53,9 @@
                 this.$store.commit("SET_TOKEN", localStorage.getItem("token"))
                 //console.log("localStorage token:"+localStorage.getItem("token"))
             }
-            if (sessionStorage.getItem("userInfo") !== '') {
+            if (localStorage.getItem("userInfo") !== '') {
                 //console.log(sessionStorage.getItem("userInfo"));
-                this.$store.commit("SET_USERINFO", JSON.parse(sessionStorage.getItem("userInfo")))
+                this.$store.commit("SET_USERINFO", JSON.parse(localStorage.getItem("userInfo")))
                 //console.log("sessionStorage userInfo:"+JSON.parse(sessionStorage.getItem("userInfo")).username)
             }
 

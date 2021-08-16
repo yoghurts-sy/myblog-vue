@@ -13,11 +13,18 @@ axios.interceptors.request.use(config => {
 //后置拦截
 axios.interceptors.response.use(response => {
     let res = response.data
-
-
-    console.log("interceptors response:"+res.code)
-    if (res.code === "200") {
-        return response;
+    console.log("interceptors response status:"+response.status)
+    if (response.status === 200) {
+        if (res.code !== undefined) {
+            if (res.code === "200") {
+                return response;
+            } else {
+                Element.Message.error(res.msg, {duration: 3 * 1000});
+                return Promise.reject(res.msg);
+            }
+        } else {
+            return response;
+        }
     } else {
         Element.Message.error(res.msg, {duration: 3 * 1000});
         return Promise.reject(res.msg);

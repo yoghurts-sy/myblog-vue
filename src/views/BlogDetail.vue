@@ -65,24 +65,19 @@
             downloadMd() {
                 let _this = this
                 console.log(_this.blog.title)
-                let URL = "/api/md/download"
-                this.$axios.post(URL,{
-                        "id": _this.blog.blogId,
-                        "title":_this.blog.title
-                    },{
+                let URL = "/api/md/download?id="+_this.blog.blogId +"&title="+_this.blog.title
+                this.$axios.get(URL,{
                         headers:{
                             "Authorization": _this.$store.state.token
                         },
                         responseType:'blob',
                 }
-                ).then(res=>{
+                ).then(res =>{
                     let blob = new Blob([res.data], {type: res.data.type})
                     let href = window.URL.createObjectURL(blob);
-                    console.log(href)
                     const a = document.createElement('a')
-
                     a.setAttribute('href', href)
-                    a.setAttribute('download', "name")
+                    a.setAttribute('download', _this.blog.title+".md")
                    /* a.setAttribute('target', '_blank')*/
 
                     document.body.appendChild(a);
