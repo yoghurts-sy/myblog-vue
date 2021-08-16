@@ -119,7 +119,6 @@
                 //自动保存
             },
             uploadMdSuccess(res) {
-                console.log("res:"+res.data)
                 this.preContent = this.ruleForm.content
                 this.ruleForm.content = res.data
             },

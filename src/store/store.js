@@ -15,13 +15,13 @@ export default new Vuex.Store({
     },
     SET_USERINFO:(state, userInfo) => {
       state.userInfo = userInfo
-      sessionStorage.setItem("userInfo", JSON.stringify(userInfo))
+      localStorage.setItem("userInfo", JSON.stringify(userInfo))
     },
     REMOVE_INFO:(state) => {
       state.token = ''
       state.userInfo = {}
       localStorage.setItem("token", '')
-      sessionStorage.setItem("userInfo", '')
+      localStorage.setItem("userInfo", '')
     }
   },getters: {
     getUser: state => {
