@@ -8,6 +8,9 @@
                     编辑
                 </router-link>
             </el-link>
+            <el-link icon="el-icon-download" style="margin-left:10px" @click="downloadMd" v-show="validateUser">
+                 导出Markdown
+            </el-link>
             <el-divider></el-divider>
             <div class="markdown-body" v-html="blog.content"></div>
         </div>
@@ -25,9 +28,9 @@
             return {
                 blog: {
                     userId:null,
-                    title:'123123',
-                    description:'1231',
-                    content:'## 123',
+                    title:'',
+                    description:'',
+                    content:'',
                     blogId: null
                 },
                 validateUser:false
@@ -57,6 +60,37 @@
                     }
                 }
             })
+        },
+        methods: {
+            downloadMd() {
+                let _this = this
+                console.log(_this.blog.title)
+                let URL = "/api/md/download"
+                this.$axios.post(URL,{
+                        "id": _this.blog.blogId,
+                        "title":_this.blog.title
+                    },{
+                        headers:{
+                            "Authorization": _this.$store.state.token
+                        },
+                        responseType:'blob',
+                }
+                ).then(res=>{
+                    let blob = new Blob([res.data], {type: res.data.type})
+                    let href = window.URL.createObjectURL(blob);
+                    console.log(href)
+                    const a = document.createElement('a')
+
+                    a.setAttribute('href', href)
+                    a.setAttribute('download', "name")
+                   /* a.setAttribute('target', '_blank')*/
+
+                    document.body.appendChild(a);
+                    a.click(); //点击下载
+                    document.body.removeChild(a); //下载完成移除元素
+                    window.URL.revokeObjectURL(href); //释放blob
+                })
+            }
         }
     }
 </script>
