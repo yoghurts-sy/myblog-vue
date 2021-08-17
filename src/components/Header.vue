@@ -1,16 +1,13 @@
 <template>
     <div class="m-content">
-        <h3 style="font-style:oblique;">Welcome to
-            <span v-show="hasLogin">{{ user.username }}’s</span>
-            <span v-show="!hasLogin">Yoghurt</span>
-             Blogs
+        <h3 style="font-style:oblique;">Welcome to Blogs of {{ headName }}
         </h3>
         <div>
             <el-avatar icon="el-icon-user-solid" :size="50" :src='user.avatar'></el-avatar>
             <div>{{ user.username }}</div>
         </div>
         <div class="maction">
-            <span><el-link href="/blogs" >home</el-link></span>
+            <span><el-link href="/blogs" :disabled="!hasLogin">home</el-link></span>
             <el-divider direction="vertical"></el-divider>
             <span><el-link type="success" href="/blog/add" :disabled="!hasLogin">new blog</el-link></span>
             <el-divider direction="vertical"></el-divider>
@@ -29,7 +26,8 @@
                     username:'Please sign in',
                     avatar:''
                 },
-                hasLogin:false
+                hasLogin:false,
+                headName:'Yoghurt'
             }
         },
         methods:{
@@ -49,6 +47,10 @@
             }
         },
         created() {
+            if (this.$route.params.username !== undefined) {
+                this.headName = this.$route.params.username
+            }
+            console.log("header:"+this.$route.params.username)
             if (localStorage.getItem("token") !== '') {
                 this.$store.commit("SET_TOKEN", localStorage.getItem("token"))
                 //console.log("localStorage token:"+localStorage.getItem("token"))

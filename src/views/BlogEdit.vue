@@ -9,18 +9,21 @@
                 <el-input v-model="ruleForm.description"></el-input>
             </el-form-item>
             <el-form-item label="内容" prop="content">
-                <el-upload
+                    <el-upload
                         class="upload-demo"
                         action="http://localhost:8090/api/md/convert2String"
                         :on-preview="handlePreview"
                         :on-remove="handleRemove"
                         :on-success="uploadMdSuccess"
                         :auto-upload="true">
-                        <el-link icon="el-icon-document"
+                    <el-link icon="el-icon-document"
                              :disabled="validateUser"
-                                 slot="trigger"
+                             slot="trigger"
                     >上传本地Markdown</el-link>
-                    <!--<el-button slot="trigger" size="small" type="primary">选取文件</el-button>--><!--@click="uploadMd"-->
+                        <el-link
+                                type="success" class="save-successful" v-loading="saving" element-loading-spinner="el-icon-loading"
+                                icon="el-icon-success"
+                        >已自动保存</el-link>
                 </el-upload>
 
                 <mavon-editor ref=md v-model="ruleForm.content" @imgAdd="imgAdd" @imgDel="imgDel"
@@ -43,6 +46,7 @@
         components: {Header},
         data(){
             return {
+                saving:true,
                 preContent:'',
                 userId:null,
                 validateUser:false,
@@ -73,7 +77,6 @@
                     if (valid) {
                         const _this = this
                         this.$axios.post('/blog/edit', _this.ruleForm, {
-
                             headers:{
                                 "Authorization":_this.$store.state.token
                             }
@@ -111,11 +114,18 @@
                     let url = res.data.data
                     _this.$refs.md.$imglst2Url([[pos, url]])
                 })
+                this.updateContent()
             },
             imgDel(pos) {
 
             },
             changeContent(value, render) {
+                this.saving = true;
+                let _this = this;
+                if (value !== this.preContent) {
+                    this.preContent = value
+                    this.updateContent()
+                }
                 //自动保存
             },
             uploadMdSuccess(res) {
@@ -127,6 +137,16 @@
             },
             handleRemove() {
                 this.ruleForm.content = this.preContent
+            },
+            updateContent() {
+                let _this = this
+                this.$axios.post('/blog/edit', _this.ruleForm, {
+                    headers:{
+                        "Authorization":_this.$store.state.token
+                    }
+                }).then(res => {
+                    _this.saving = false
+                })
             }
         },
         created() {
@@ -154,5 +174,11 @@
 </script>
 
 <style scoped>
+    .upload-demo {
+    }
+    .save-successful {
+        margin-left: 15px;
+        margin-top: 2px;
+    }
 
 </style>
