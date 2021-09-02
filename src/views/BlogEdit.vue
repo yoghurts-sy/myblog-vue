@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Header></Header>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="标题" prop="title">
                 <el-input v-model="ruleForm.title"></el-input>
@@ -9,18 +8,27 @@
                 <el-input v-model="ruleForm.description"></el-input>
             </el-form-item>
             <el-form-item label="内容" prop="content">
-                <el-upload
+                    <el-upload
                         class="upload-demo"
                         action="http://localhost:8090/api/md/convert2String"
                         :on-preview="handlePreview"
                         :on-remove="handleRemove"
                         :on-success="uploadMdSuccess"
                         :auto-upload="true">
-                        <el-link icon="el-icon-document"
+                    <el-link icon="el-icon-document"
                              :disabled="validateUser"
-                                 slot="trigger"
+                             slot="trigger"
                     >上传本地Markdown</el-link>
-                    <!--<el-button slot="trigger" size="small" type="primary">选取文件</el-button>--><!--@click="uploadMd"-->
+                        <el-link v-show="originContent !== ruleForm.content"
+                                type="success" class="save-successful" v-loading="saving" element-loading-spinner="el-icon-loading"
+                                icon="el-icon-success"
+                        >已自动保存</el-link>
+                        <el-link v-show="!isNewBlog"
+                                  class="save-successful"
+                                 type="danger"
+                                 icon="el-icon-delete"
+                                 @click="deleteBlog"
+                        >删除博客</el-link>
                 </el-upload>
 
                 <mavon-editor ref=md v-model="ruleForm.content" @imgAdd="imgAdd" @imgDel="imgDel"
@@ -29,7 +37,7 @@
             </el-form-item>
             <el-form-item >
                 <el-button type="primary" @click="submitForm('ruleForm')" :disabled="validateUser">保存</el-button>
-                <el-button @click="resetForm('ruleForm')" :disabled="validateUser">重置</el-button>
+                <el-button @click="returnVersion" :disabled="validateUser">返回编辑前版本</el-button>
                 <span v-show="validateUser" style="margin-left: 35px; color: red">It's not your blogs. You don't have right to edit it.</span>
             </el-form-item>
         </el-form>
@@ -37,15 +45,18 @@
 </template>
 
 <script>
-    import Header from "../components/Header";
     export default {
         name: "BlogEdit",
-        components: {Header},
         data(){
             return {
+                originContent:'',
+                originVersion:{},
+                saving:true,
                 preContent:'',
+                preVersion:{},
                 userId:null,
                 validateUser:false,
+                isNewBlog:false,
                 ruleForm: {
                     id:null,
                     title: '',
@@ -62,8 +73,7 @@
                         { min: 5, message: 'Description two short!! At least 5 bytes.', trigger: 'blur' }
                     ],
                     content: [
-                        { required: true, message: 'Please enter content.', trigger: 'blur' },
-                        { min: 5, message: 'Content two short!!At least 5 bytes.', trigger: 'blur' }
+                        { required: true, message: 'Please enter content.', trigger: 'blur' }
                     ],
             }
         }
@@ -73,7 +83,6 @@
                     if (valid) {
                         const _this = this
                         this.$axios.post('/blog/edit', _this.ruleForm, {
-
                             headers:{
                                 "Authorization":_this.$store.state.token
                             }
@@ -110,12 +119,21 @@
                     console.log("res:"+res.data)
                     let url = res.data.data
                     _this.$refs.md.$imglst2Url([[pos, url]])
+                    console.log("替换")
+                    this.updateContent()
                 })
+
             },
             imgDel(pos) {
 
             },
-            changeContent(value, render) {
+            changeContent(value) {
+                this.saving = true;
+                if (this.ruleForm.id !== null &&  this.ruleForm.content !== this.preContent && value !== null) {
+                    this.isNewBlog = false
+                    this.preContent = this.ruleForm.content
+                    this.updateContent()
+                }
                 //自动保存
             },
             uploadMdSuccess(res) {
@@ -127,6 +145,62 @@
             },
             handleRemove() {
                 this.ruleForm.content = this.preContent
+            },
+            updateContent() {
+                let _this = this
+                this.$axios.post('/blog/edit', _this.ruleForm, {
+                    headers:{
+                        "Authorization":_this.$store.state.token
+                    }
+                }).then(res => {
+                    _this.saving = false
+                })
+            },
+            deleteBlog() {
+                console.log("delete blog")
+
+                //应该加一个confirm
+
+                this.$confirm('此操作将永久删除该博客, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    const _this = this
+                    this.$axios.post('/blog/delete', _this.ruleForm, {
+                        headers:{
+                            "Authorization":_this.$store.state.token
+                        }
+                    }).then(res => {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        _this.$router.push("/blogs")
+                    })
+
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+
+            },
+            returnVersion() {
+                let _this = this
+                this.$confirm('此操作将返回编辑前的版本, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    _this.ruleForm.content = _this.originContent
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消操作'
+                    });
+                });
             }
         },
         created() {
@@ -140,19 +214,30 @@
                     _this.ruleForm.description = blog.description
                     _this.ruleForm.content = blog.content
                     _this.userId = blog.userId
+                    _this.originContent = blog.content
+                    _this.preContent = blog.content
                     if (_this.userId) {
                         if (this.$store.state.userInfo.id === this.userId) {
                             this.validateUser = false;
+                            this.isNewBlog = false
                         } else {
                             this.validateUser = true;
                         }
                     }
                 })
+            } else {
+                this.isNewBlog = true;
             }
         }
     }
 </script>
 
 <style scoped>
+    .upload-demo {
+    }
+    .save-successful {
+        margin-left: 15px;
+        margin-top: 2px;
+    }
 
 </style>
