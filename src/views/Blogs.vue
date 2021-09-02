@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Header></Header>
+        <!--<Header2></Header2>-->
         <div class="block">
             <el-timeline>
                 <el-timeline-item v-bind:timestamp="blog.created" placement="top" v-for="(blog,index) in blogs" :key="index">
@@ -20,14 +20,15 @@
                     :total="total">
             </el-pagination>
         </div>
+        <Header></Header>
     </div>
 </template>
 
 <script>
-    import Header from "../components/Header";
+    import Header2 from "../components/Header2";
     export default {
         name: "Blogs",
-        components: {Header},
+        components: {Header2},
         data() {
             return{
                 blogs:{},

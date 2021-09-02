@@ -1,9 +1,8 @@
 <template>
     <div>
-        <Header></Header>
         <div class="m-markdown-body">
             <h2>{{ blog.title }}</h2>
-            <el-link icon="el-icon-edit" v-show="validateUser" href="">
+            <el-link icon="el-icon-edit" v-show="validateUser" >
                 <router-link :to="{name:'BlogEdit', params:{blogId: blog.blogId}}">
                     编辑
                 </router-link>
@@ -18,12 +17,10 @@
 </template>
 
 <script>
-    import Header from "../components/Header";
     import 'github-markdown-css/github-markdown.css';
 
     export default {
         name: "BlogDetail",
-        components: {Header},
         data() {
             return {
                 blog: {
